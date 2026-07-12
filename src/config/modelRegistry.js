@@ -5,9 +5,11 @@
  */
 
 import Department from '../models/Department.js';
+import Challenge from '../models/Challenge.js';
 
 const modelRegistry = {
   departments: Department,
+  challenges: Challenge,
 };
 
 /**
