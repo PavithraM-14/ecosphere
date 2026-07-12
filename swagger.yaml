@@ -1,0 +1,892 @@
+openapi: 3.0.0
+info:
+  title: EcoSphere ESG Management Platform API
+  version: 1.0.0
+  description: |
+    RESTful API for EcoSphere - A comprehensive ESG (Environmental, Social, Governance) management platform.
+    
+    ## Features
+    - JWT-based authentication
+    - Generic CRUD operations for all entities
+    - Workflow management with status transitions
+    - Dashboard analytics and metrics
+    - ESG report generation
+    
+    ## Authentication
+    Most endpoints require JWT authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your_jwt_token>
+    ```
+  contact:
+    name: EcoSphere Team
+    email: support@ecosphere.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+  - url: https://api.ecosphere.com
+    description: Production server
+
+tags:
+  - name: System
+    description: System health and status
+  - name: Authentication
+    description: User authentication and authorization
+  - name: CRUD Operations
+    description: Generic CRUD operations for all entities
+  - name: Workflow
+    description: Status workflow management
+  - name: Dashboard
+    description: Dashboard data and analytics
+  - name: Reports
+    description: ESG report generation
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Check if the API is running
+      tags: [System]
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: EcoSphere API is running
+                  timestamp:
+                    type: string
+                    format: date-time
+                  environment:
+                    type: string
+                    example: development
+
+  # Authentication Endpoints
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      description: Create a new user account
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name:
+                  type: string
+                  example: John Doe
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+                  example: password123
+                role:
+                  type: string
+                  enum: [Admin, Employee]
+                  default: Employee
+                department:
+                  type: string
+                  example: Engineering
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      user:
+                        $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/auth/login:
+    post:
+      summary: Login user
+      description: Authenticate user and get JWT token
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                      user:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/me:
+    get:
+      summary: Get current user
+      description: Get authenticated user information
+      tags: [Authentication]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User information retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # CRUD Endpoints
+  /api/crud/{entity}:
+    get:
+      summary: Get all records
+      description: Retrieve all records for an entity with pagination, sorting, and search
+      tags: [CRUD Operations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          description: Entity name (e.g., departments, challenges, badges)
+          schema:
+            type: string
+            enum: [departments, challenges, categories, emissionfactors, carbontransactions, environmentalgoals, esgpolicies, badges, rewards]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Records per page
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          description: Sort field
+          schema:
+            type: string
+        - name: order
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: search
+          in: query
+          description: Search keyword
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Records retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalRecords:
+                        type: integer
+                      hasNext:
+                        type: boolean
+                      hasPrev:
+                        type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    
+    post:
+      summary: Create a new record
+      description: Create a new record for an entity
+      tags: [CRUD Operations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Entity-specific fields
+      responses:
+        '201':
+          description: Record created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/crud/{entity}/{id}:
+    get:
+      summary: Get a single record
+      description: Retrieve a single record by ID
+      tags: [CRUD Operations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          description: Record ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Record retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    put:
+      summary: Update a record
+      description: Update an existing record by ID
+      tags: [CRUD Operations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Record updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    delete:
+      summary: Delete a record
+      description: Delete a record by ID
+      tags: [CRUD Operations]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Record deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Workflow Endpoints
+  /api/workflow/{entity}/{id}/status:
+    patch:
+      summary: Change entity status
+      description: Change the status of an entity following workflow rules
+      tags: [Workflow]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+            example: challenges
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  example: Active
+      responses:
+        '200':
+          description: Status changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/workflow/{entity}/{id}/history:
+    get:
+      summary: Get workflow history
+      description: Get the status change history for an entity
+      tags: [Workflow]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: History retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+
+  # Dashboard Endpoints
+  /api/dashboard:
+    get:
+      summary: Get dashboard summary
+      description: Get complete dashboard summary with ESG scores, counts, and analytics
+      tags: [Dashboard]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dashboard data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      overallESGScore:
+                        type: integer
+                        example: 71
+                      environmentalScore:
+                        type: integer
+                        example: 65
+                      socialScore:
+                        type: integer
+                        example: 69
+                      governanceScore:
+                        type: integer
+                        example: 80
+                      departmentCount:
+                        type: integer
+                      employeeCount:
+                        type: integer
+                      activeChallenges:
+                        type: integer
+                      pendingCompliance:
+                        type: integer
+                      carbonEmission:
+                        type: number
+                      leaderboard:
+                        type: array
+                        items:
+                          type: object
+                      departmentRanking:
+                        type: array
+                        items:
+                          type: object
+                      recentActivities:
+                        type: array
+                        items:
+                          type: object
+
+  /api/dashboard/ranking:
+    get:
+      summary: Get department ranking
+      description: Get departments ranked by carbon emissions
+      tags: [Dashboard]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Ranking retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rank:
+                          type: integer
+                        departmentId:
+                          type: string
+                        departmentName:
+                          type: string
+                        totalEmissions:
+                          type: number
+
+  /api/dashboard/leaderboard:
+    get:
+      summary: Get leaderboard
+      description: Get top users by XP
+      tags: [Dashboard]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Number of users to return
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Leaderboard retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rank:
+                          type: integer
+                        userId:
+                          type: string
+                        name:
+                          type: string
+                        xp:
+                          type: integer
+
+  /api/dashboard/activities:
+    get:
+      summary: Get recent activities
+      description: Get recent carbon transactions
+      tags: [Dashboard]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Activities retrieved successfully
+
+  /api/dashboard/compliance:
+    get:
+      summary: Get pending compliance
+      description: Get pending compliance issues
+      tags: [Dashboard]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Compliance issues retrieved
+
+  # Report Endpoints
+  /api/reports/environment:
+    get:
+      summary: Generate environmental report
+      description: Generate environmental report with carbon emissions analysis
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          description: Start date for filtering (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date for filtering (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Environmental report generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: Environmental Report
+                      generatedAt:
+                        type: string
+                        format: date-time
+                      period:
+                        type: object
+                        properties:
+                          startDate:
+                            type: string
+                          endDate:
+                            type: string
+                      summary:
+                        type: string
+                      statistics:
+                        type: object
+                        properties:
+                          totalEmissions:
+                            type: number
+                          transactionCount:
+                            type: integer
+                          activeGoals:
+                            type: integer
+                      chartsData:
+                        type: object
+                      recommendations:
+                        type: array
+                        items:
+                          type: string
+
+  /api/reports/social:
+    get:
+      summary: Generate social report
+      description: Generate social report with employee engagement analysis
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Social report generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: Social Report
+                      generatedAt:
+                        type: string
+                        format: date-time
+                      summary:
+                        type: string
+                      statistics:
+                        type: object
+                      chartsData:
+                        type: object
+                      recommendations:
+                        type: array
+                        items:
+                          type: string
+
+  /api/reports/governance:
+    get:
+      summary: Generate governance report
+      description: Generate governance report with policies and compliance
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Governance report generated
+
+  /api/reports/summary:
+    get:
+      summary: Generate ESG summary report
+      description: Generate combined ESG summary report with overall scores
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Summary report generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: ESG Summary Report
+                      esgScores:
+                        type: object
+                        properties:
+                          overall:
+                            type: integer
+                          environmental:
+                            type: integer
+                          social:
+                            type: integer
+                          governance:
+                            type: integer
+                      sections:
+                        type: object
+                      recommendations:
+                        type: array
+                        items:
+                          type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /api/auth/login or /api/auth/register
+
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [Admin, Employee]
+        department:
+          type: string
+        xp:
+          type: integer
+        points:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request - Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: Unauthorized - Invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            message: Not authorized, no token
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

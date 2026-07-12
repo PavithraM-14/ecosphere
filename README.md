@@ -242,6 +242,62 @@ CLIENT_URL=http://localhost:3000
 - `404` - Not Found
 - `500` - Internal Server Error
 
+## 📚 API Documentation
+
+### Interactive Swagger UI
+
+Access comprehensive, interactive API documentation at:
+```
+http://localhost:5000/api-docs
+```
+
+**Features:**
+- ✅ **Interactive Testing** - Try all endpoints directly from your browser
+- ✅ **Request/Response Examples** - See exactly what to send and expect
+- ✅ **JWT Authentication** - Test with your token easily
+- ✅ **Schema Definitions** - Understand all data models
+- ✅ **Professional Presentation** - Perfect for hackathon demos
+
+### Quick Start with API Docs
+
+1. **Start the server:**
+   ```bash
+   npm run dev
+   ```
+
+2. **Open Swagger UI:**
+   Navigate to http://localhost:5000/api-docs
+
+3. **Authenticate:**
+   - Login via `/api/auth/login`
+   - Copy the JWT token
+   - Click **Authorize** button
+   - Enter: `Bearer YOUR_TOKEN`
+
+4. **Test Endpoints:**
+   - All endpoints are now accessible
+   - Click **Try it out** on any endpoint
+   - See live responses
+
+### Documentation Files
+
+- **`swagger.yaml`** - OpenAPI 3.0 specification (YAML)
+- **`swagger.json`** - OpenAPI 3.0 specification (JSON)
+- **`API_DOCUMENTATION.md`** - Complete API guide with examples
+
+### For Your Frontend Team
+
+The OpenAPI specification provides everything needed for frontend integration:
+- All endpoint URLs and methods
+- Request/response schemas
+- Authentication requirements
+- Query parameters and filters
+- Error responses
+
+📚 **Full API Guide:** See `API_DOCUMENTATION.md`
+
+---
+
 ## 🚧 Development Progress
 
 - ✅ **STEP 1:** Project Setup (Completed)
@@ -252,7 +308,7 @@ CLIENT_URL=http://localhost:3000
 - ✅ **STEP 6:** Core ESG Models (Completed)
 - ✅ **STEP 7:** Business Services Layer (Completed)
 - ✅ **STEP 8:** Dashboard API Layer (Completed)
-- ⏳ Report API Layer (Planned)
+- ✅ **STEP 9:** Report API Layer (Completed)
 - ⏳ AI Integration (Planned)
 
 ## 🔧 Generic CRUD Engine
@@ -588,6 +644,105 @@ node verify-dashboard-api.js
 Expected: ✅ 26/26 tests passed (100% success rate)
 
 📚 **Full Documentation:** See `DASHBOARD_API_VERIFICATION_REPORT.md`
+
+## 📄 Report API Layer
+
+The EcoSphere backend includes a complete Report API that consumes the reportService:
+
+### Features
+- ✅ **4 API Endpoints** - Complete ESG reporting functionality
+- ✅ **JWT Protected** - All routes require authentication
+- ✅ **Service Integration** - No business logic in controllers
+- ✅ **Standardized Responses** - Consistent JSON format
+- ✅ **Date Filtering** - Optional date range for reports
+- ✅ **Production Ready** - 100% test coverage (24/24 tests passed)
+
+### API Endpoints
+
+#### Generate Environmental Report
+```bash
+GET /api/reports/environment?startDate=2026-01-01&endDate=2026-12-31
+Authorization: Bearer <token>
+
+Response: {
+  "success": true,
+  "data": {
+    "title": "Environmental Report",
+    "generatedAt": "...",
+    "summary": "...",
+    "statistics": {
+      "totalEmissions": 92,
+      "transactionCount": 1,
+      "activeGoals": 2
+    },
+    "chartsData": {
+      "emissionsByDepartment": [...],
+      "emissionsBySource": [...],
+      "goalsProgress": [...]
+    },
+    "recommendations": [...]
+  }
+}
+```
+
+#### Generate Social Report
+```bash
+GET /api/reports/social
+Authorization: Bearer <token>
+
+Response: Employee engagement and challenges analysis
+```
+
+#### Generate Governance Report
+```bash
+GET /api/reports/governance
+Authorization: Bearer <token>
+
+Response: Policies and compliance analysis
+```
+
+#### Generate ESG Summary Report
+```bash
+GET /api/reports/summary
+Authorization: Bearer <token>
+
+Response: Combined ESG report with overall scores
+```
+
+### Controller Pattern
+
+Controllers are thin and only orchestrate service calls:
+
+```javascript
+export const generateEnvironmentalReport = async (req, res, next) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const options = {};
+    if (startDate) options.startDate = startDate;
+    if (endDate) options.endDate = endDate;
+    
+    // Call service - NO business logic in controller
+    const report = await reportService.generateEnvironmentalReport(options);
+    
+    res.status(200).json({
+      success: true,
+      data: report,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+```
+
+### Verification
+Run comprehensive tests:
+```bash
+node verify-report-api.js
+```
+
+Expected: ✅ 24/24 tests passed (100% success rate)
+
+📚 **Full Documentation:** See `REPORT_API_VERIFICATION_REPORT.md`
 
 ## 🤝 Best Practices Implemented
 

@@ -1,12 +1,19 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
 import authRoutes from './routes/authRoutes.js';
 import crudRoutes from './routes/crudRoutes.js';
 import workflowRoutes from './routes/workflowRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 import notFound from './middleware/notFound.js';
+
+// Load Swagger documentation
+const swaggerDocument = YAML.load('./swagger.yaml');
 
 // Load environment variables
 dotenv.config();
@@ -52,15 +59,29 @@ app.get('/api', (req, res) => {
     version: '1.0.0',
     endpoints: {
       auth: '/api/auth',
+      crud: '/api/crud',
+      workflow: '/api/workflow',
+      dashboard: '/api/dashboard',
+      reports: '/api/reports',
+      notifications: '/api/notifications',
+      docs: '/api-docs',
       health: '/health',
     },
   });
 });
 
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'EcoSphere API Documentation',
+}));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/crud', crudRoutes);
 app.use('/api/workflow', workflowRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Error handling middleware (must be last)
 app.use(notFound);
