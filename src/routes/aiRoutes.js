@@ -11,7 +11,8 @@ import {
   chatAI,
   getSustainabilityAdvice,
   getRankingExplanation,
-  getRecommendGoals
+  getRecommendGoals,
+  simulateESGImpact
 } from "../controllers/aiController.js";
 
 const router = express.Router();
@@ -36,6 +37,9 @@ router.post("/ranking-explanation", getRankingExplanation);
 
 // Route configuration mapping POST /api/ai/recommend-goals to getRecommendGoals controller (Feature 3 - Hour 5-7)
 router.post("/recommend-goals", getRecommendGoals);
+
+// Route configuration mapping POST /api/ai/simulate to simulateESGImpact controller (Feature: What-If Simulator)
+router.post("/simulate", simulateESGImpact);
 
 
 export default router;
