@@ -10,5 +10,12 @@ router.post('/login', login);
 
 // Protected routes
 router.get('/me', protect, getMe);
+router.get('/profile', protect, (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Authenticated',
+    user: req.user,
+  });
+});
 
 export default router;
