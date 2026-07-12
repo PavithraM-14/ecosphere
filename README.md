@@ -249,9 +249,54 @@ The following features are planned but not yet implemented:
 - ✅ **STEP 1:** Project Setup (Completed)
 - ✅ **STEP 2:** MongoDB Connection (Completed)
 - ✅ **STEP 3:** Authentication Module (Completed)
-- ⏳ **STEP 4:** CRUD Engine
+- ✅ **STEP 4:** Generic CRUD Engine (Completed)
 - ⏳ **STEP 5:** Workflow Engine
 - ⏳ Additional ESG-specific features
+
+## 🔧 Generic CRUD Engine
+
+The EcoSphere backend includes a powerful Generic CRUD Engine that eliminates repetitive code:
+
+### Features
+- ✅ **One Controller for All Entities** - No need to write DepartmentController, RewardController, etc.
+- ✅ **Automatic Pagination** - Query: `?page=1&limit=10`
+- ✅ **Sorting Support** - Query: `?sort=name&order=asc`
+- ✅ **Auto Search** - Query: `?search=keyword` (searches all string fields)
+- ✅ **Validation** - ObjectId validation, empty update rejection
+- ✅ **Logging** - All CREATE, UPDATE, DELETE operations logged
+
+### API Endpoints
+```
+POST   /api/crud/:entity        # Create record
+GET    /api/crud/:entity        # Get all (with pagination, sorting, search)
+GET    /api/crud/:entity/:id    # Get single record
+PUT    /api/crud/:entity/:id    # Update record
+DELETE /api/crud/:entity/:id    # Delete record
+```
+
+### Example Usage
+```bash
+# Create a department
+POST /api/crud/departments
+{
+  "name": "Information Technology",
+  "head": "John Doe",
+  "status": "Active"
+}
+
+# Get all departments with pagination
+GET /api/crud/departments?page=1&limit=10&sort=name&order=asc
+
+# Search departments
+GET /api/crud/departments?search=IT
+```
+
+### Adding New Entities
+1. Create model in `src/models/YourModel.js`
+2. Register in `src/config/modelRegistry.js`
+3. Use immediately! No controller or routes needed.
+
+📚 **Full Documentation:** See `CRUD_ENGINE_DOCUMENTATION.md`
 
 ## 🤝 Best Practices Implemented
 
