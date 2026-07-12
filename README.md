@@ -345,6 +345,64 @@ Draft → Active → Under Review → Completed → Archived
 
 📚 **Full Documentation:** See `WORKFLOW_ENGINE_DOCUMENTATION.md`
 
+## 🌍 Core ESG Business Models
+
+The EcoSphere platform includes 8 core business models for ESG management:
+
+### Models
+1. **Department** - Organizational structure with code, head, employee count
+2. **Category** - Classify CSR Activities and Challenges
+3. **EmissionFactor** - Carbon calculation factors (source, unit, factor)
+4. **CarbonTransaction** - Track department carbon emissions
+5. **EnvironmentalGoal** - Sustainability targets with progress tracking
+6. **ESGPolicy** - Corporate ESG policies with effective dates
+7. **Badge** - Gamification achievements
+8. **Reward** - Points-based reward system
+
+### Features
+- ✅ **Full CRUD Operations** - All models work with CRUD Engine
+- ✅ **Validation** - Required fields, enums, non-negative values
+- ✅ **Relationships** - ObjectId references between models
+- ✅ **Indexes** - Optimized for common queries
+- ✅ **Virtual Fields** - Calculated fields (e.g., goal progress)
+- ✅ **Timestamps** - Auto-tracked creation and updates
+
+### API Usage
+```bash
+# Department operations
+POST   /api/crud/departments
+GET    /api/crud/departments
+PUT    /api/crud/departments/:id
+DELETE /api/crud/departments/:id
+
+# All other models follow the same pattern:
+# categories, emissionfactors, carbontransactions,
+# environmentalgoals, esgpolicies, badges, rewards
+```
+
+### Example: Track Carbon Emissions
+```bash
+# Create emission factor
+POST /api/crud/emissionfactors
+{
+  "source": "Electricity",
+  "unit": "kWh",
+  "factor": 0.92
+}
+
+# Record transaction
+POST /api/crud/carbontransactions
+{
+  "department": "DEPT_ID",
+  "source": "Electricity",
+  "quantity": 1000,
+  "emissionFactor": "FACTOR_ID",
+  "calculatedEmission": 920
+}
+```
+
+📚 **Full Documentation:** See `ESG_MODELS_DOCUMENTATION.md`
+
 ## 🤝 Best Practices Implemented
 
 - Clean Architecture with separation of concerns
