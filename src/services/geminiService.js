@@ -27,6 +27,7 @@ const ai = new GoogleGenAI({
 /**
  * Reusable function to generate a text response from the Gemini API.
  * Uses the recommended 'gemini-3.5-flash' model for basic text and summarization tasks.
+ * Optimized and validated for the EcoSphere ESG Report Generator and Assistant Chat.
  * 
  * @param {string} prompt - The text prompt or instruction to send to the model.
  * @returns {Promise<string>} The generated response text.
@@ -53,3 +54,4 @@ export async function generateResponse(prompt) {
     throw error;
   }
 }
+

@@ -83,3 +83,75 @@ Your report must be structured with the following exact sections:
 
 Keep the tone highly professional, objective, and analytical, suitable for corporate executives and investors.`;
 };
+
+/**
+ * Generates a prompt for a detailed sustainability report for Feature 1
+ * @param {object} data - The company sustainability details
+ * @returns {string} The formatted prompt
+ */
+export const esgGenerateReportTemplate = (data) => {
+  const {
+    companyName = "EcoSphere",
+    department = "General",
+    environmentScore = "N/A",
+    socialScore = "N/A",
+    governanceScore = "N/A",
+    carbonEmission = "N/A",
+    initiatives = []
+  } = data || {};
+
+  const initiativesList = Array.isArray(initiatives) && initiatives.length > 0
+    ? initiatives.map(init => `- ${init}`).join("\n")
+    : "None listed";
+
+  return `You are an elite sustainability and ESG analyst. Generate a comprehensive, professional, and audit-ready ESG sustainability report for the following company/department details:
+
+Company Name: ${companyName}
+Department: ${department}
+Environment Score: ${environmentScore}/100
+Social Score: ${socialScore}/100
+Governance Score: ${governanceScore}/100
+Carbon Emission Status: ${carbonEmission}
+
+Current Initiatives:
+${initiativesList}
+
+The generated report must be highly detailed and structured with the following exact headings:
+1. Executive Summary: A concise high-level overview of the sustainability profile for ${companyName} - ${department} department.
+2. Environmental Performance: A detailed analysis of the environmental efforts, the Environmental Score (${environmentScore}), and carbon footprint (${carbonEmission}).
+3. Social Performance: A deep dive into workforce safety, employee engagement, diversity, and social impact indicators based on the Social Score (${socialScore}).
+4. Governance Performance: Critical review of transparency, ethical leadership, corporate behavior, and structural governance based on the Governance Score (${governanceScore}).
+5. Current Challenges: Identify potential ESG roadblocks, material risks, or structural gaps based on the department metrics.
+6. Recommendations: Actionable, practical, and progressive step-by-step guidance to improve individual scores and resource management.
+7. Future Sustainability Goals: Define realistic, measurable short-term and long-term milestones for the ESG roadmap.
+
+Keep the tone expert, authoritative, analytical, and highly structured. Avoid generic fluff. Highlight how current initiatives can be scaled.`;
+};
+
+/**
+ * Generates a prompt for the EcoSphere AI Chatbot Assistant with system instructions & constraints
+ * @param {string} message - User query/message
+ * @returns {string} The formatted prompt
+ */
+export const esgChatTemplate = (message) => {
+  return `You are EcoSphere's dedicated AI ESG Assistant. EcoSphere is an advanced AI-powered ESG Management Platform designed to help companies track, analyze, and optimize their Environmental, Social, and Governance metrics.
+
+Your primary objective is to assist users with inquiries specifically related to:
+- ESG (Environmental, Social, and Governance) principles
+- Sustainability, eco-efficiency, and circular economy
+- Carbon reduction strategies, GHG protocols, and energy transitions
+- Employee welfare, human rights, labor standard practices, and diversity
+- Governance structure, board diversity, executive transparency, and compliance
+- Corporate or organizational improvement suggestions based on ESG standards
+
+Constraints:
+- Focus solely on the context of EcoSphere ESG systems and corporate sustainability.
+- If the user asks a question completely unrelated to ESG, sustainability, carbon reduction, employee welfare, governance, or company improvement, politely decline to answer, explaining that your expertise is restricted to EcoSphere ESG and sustainability topics.
+- Keep answers professional, concise, encouraging, and deeply informative.
+
+User Question: ${message}
+
+Response:`;
+};
+
+
