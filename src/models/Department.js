@@ -8,10 +8,22 @@ const departmentSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
+    code: {
+      type: String,
+      required: [true, 'Department code is required'],
+      trim: true,
+      unique: true,
+      uppercase: true,
+    },
     head: {
       type: String,
       required: [true, 'Department head is required'],
       trim: true,
+    },
+    employeeCount: {
+      type: Number,
+      default: 0,
+      min: [0, 'Employee count cannot be negative'],
     },
     status: {
       type: String,

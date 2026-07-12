@@ -6,10 +6,24 @@
 
 import Department from '../models/Department.js';
 import Challenge from '../models/Challenge.js';
+import Category from '../models/Category.js';
+import EmissionFactor from '../models/EmissionFactor.js';
+import CarbonTransaction from '../models/CarbonTransaction.js';
+import EnvironmentalGoal from '../models/EnvironmentalGoal.js';
+import ESGPolicy from '../models/ESGPolicy.js';
+import Badge from '../models/Badge.js';
+import Reward from '../models/Reward.js';
 
 const modelRegistry = {
   departments: Department,
   challenges: Challenge,
+  categories: Category,
+  emissionfactors: EmissionFactor,
+  carbontransactions: CarbonTransaction,
+  environmentalgoals: EnvironmentalGoal,
+  esgpolicies: ESGPolicy,
+  badges: Badge,
+  rewards: Reward,
 };
 
 /**
