@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
+import crudRoutes from './routes/crudRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 import notFound from './middleware/notFound.js';
 
@@ -55,6 +56,7 @@ app.get('/api', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/crud', crudRoutes);
 
 // Error handling middleware (must be last)
 app.use(notFound);
