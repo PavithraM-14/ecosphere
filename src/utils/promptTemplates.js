@@ -261,3 +261,46 @@ Example output format:
   "Achieve 95% compliance score on external environmental audits"
 ]`;
 };
+
+/**
+ * Generates a prompt for the What-If Simulator & Impact Forecaster
+ * @param {object} simulationData - The simulation inputs
+ * @returns {string} The formatted prompt
+ */
+export const esgSimulationTemplate = (simulationData) => {
+  const {
+    environmentScore = 70,
+    socialScore = 70,
+    governanceScore = 70,
+    initiatives = []
+  } = simulationData || {};
+
+  const initiativesList = Array.isArray(initiatives) && initiatives.length > 0
+    ? initiatives.map(init => `- ${init}`).join("\n")
+    : "None listed";
+
+  return `You are an elite sustainability advisor and expert AI simulation forecaster on the EcoSphere ESG Platform.
+Your task is to analyze the hypothetical impact of proposed sustainability initiatives on the current ESG metrics of a company, and forecast the projected scores and outcomes.
+
+Current Metrics:
+- Current Environment Score: ${environmentScore}/100
+- Current Social Score: ${socialScore}/100
+- Current Governance Score: ${governanceScore}/100
+
+Proposed Sustainability Initiatives:
+${initiativesList}
+
+Calculate and forecast the hypothetical post-implementation metrics and qualitative impacts. Be rigorous, realistic, and objective. 
+
+You MUST output your response as a valid JSON object ONLY. No markdown wrapping like \`\`\`json, no preamble, and no conversational explanation. The JSON object must match this exact structure:
+{
+  "projectedEnvironmentScore": number (projected environment score out of 100, must be an integer),
+  "projectedSocialScore": number (projected social score out of 100, must be an integer),
+  "projectedGovernanceScore": number (projected governance score out of 100, must be an integer),
+  "projectedOverallScore": number (weighted average or logical overall ESG score, must be an integer),
+  "carbonReductionPercentage": "string" (estimated percentage range, e.g. "12% - 15%"),
+  "financialImpact": "string" (concise explanation of estimated cost/savings),
+  "implementationChallenges": "string" (concise summary of major obstacles or material risks),
+  "recommendations": ["string"] (array of 2-4 highly actionable recommendations to optimize these initiatives)
+}`;
+};
