@@ -250,7 +250,7 @@ The following features are planned but not yet implemented:
 - ✅ **STEP 2:** MongoDB Connection (Completed)
 - ✅ **STEP 3:** Authentication Module (Completed)
 - ✅ **STEP 4:** Generic CRUD Engine (Completed)
-- ⏳ **STEP 5:** Workflow Engine
+- ✅ **STEP 5:** Workflow Engine (Completed)
 - ⏳ Additional ESG-specific features
 
 ## 🔧 Generic CRUD Engine
@@ -297,6 +297,53 @@ GET /api/crud/departments?search=IT
 3. Use immediately! No controller or routes needed.
 
 📚 **Full Documentation:** See `CRUD_ENGINE_DOCUMENTATION.md`
+
+## 🔄 Generic Workflow Engine
+
+The EcoSphere backend includes a powerful Workflow Engine for managing status transitions:
+
+### Features
+- ✅ **Generic & Reusable** - Works with any entity (Challenge, CSR Activity, Compliance, Audit)
+- ✅ **Configuration-Driven** - Define workflows in config, not code
+- ✅ **Transition Validation** - Prevents illegal status changes
+- ✅ **History Tracking** - Every status change recorded
+- ✅ **JWT Authentication** - Secure access control
+- ✅ **Automatic Logging** - All transitions logged
+
+### API Endpoints
+```
+PATCH  /api/workflow/:entity/:id/status       # Change status
+GET    /api/workflow/:entity/:id/history      # Get history
+GET    /api/workflow/:entity/:id/transitions  # Get allowed transitions
+```
+
+### Example Usage
+```bash
+# Change challenge status
+PATCH /api/workflow/challenges/:id/status
+Authorization: Bearer <token>
+{
+  "status": "Active"
+}
+
+# Get workflow history
+GET /api/workflow/challenges/:id/history
+Authorization: Bearer <token>
+```
+
+### Challenge Workflow
+```
+Draft → Active → Under Review → Completed → Archived
+(Archived can be reached from any state)
+```
+
+### Adding New Workflows
+1. Define workflow in `src/config/workflows.js`
+2. Create model with status field
+3. Register in Model Registry
+4. Use immediately!
+
+📚 **Full Documentation:** See `WORKFLOW_ENGINE_DOCUMENTATION.md`
 
 ## 🤝 Best Practices Implemented
 
