@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
 import crudRoutes from './routes/crudRoutes.js';
 import workflowRoutes from './routes/workflowRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 import notFound from './middleware/notFound.js';
 
@@ -59,6 +60,7 @@ app.get('/api', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/crud', crudRoutes);
 app.use('/api/workflow', workflowRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Error handling middleware (must be last)
 app.use(notFound);
